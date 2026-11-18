@@ -1,7 +1,7 @@
 ﻿using aoc;
 
-Day.Mode = Mode.Full;
-Day.Expect(38158151648, 45283684555);
+Day.Expect(Mode.Sample, 1227775554, 4174379265);
+Day.Expect(Mode.Full, 38158151648, 45283684555);
 Day.Run(ParseInput, Part1, Part2);
 
 static long Part1(IEnumerable<(long from, long to)> ranges) => Solve(ranges, true);

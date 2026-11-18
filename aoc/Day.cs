@@ -11,15 +11,11 @@ namespace aoc
 
 	public static class Day
 	{
-		private static string? _expected1;
-		private static string? _expected2;
+		private static readonly Dictionary<Mode, (string? expected1, string? expected2)> _expected = [];
 
-		public static Mode Mode { get; set;	} = Mode.Full;
-
-		public static void Expect<T1, T2>(T1? expected1, T2? expected2 = default)
+		public static void Expect<T1, T2>(Mode mode, T1? expected1, T2? expected2 = default)
 		{
-			_expected1 = expected1?.ToString();
-			_expected2 = expected2?.ToString();
+			_expected[mode] = (expected1?.ToString(), expected2?.ToString());
 		}
 		
 		public static void Run<RET1, RET2>(Func<IEnumerable<string>, RET1>? part1, Func<IEnumerable<string>, RET2>? part2 = null) =>
@@ -27,15 +23,26 @@ namespace aoc
 
 		public static void Run<INPUT, RET1, RET2>(Func<string, INPUT> readInput, Func<INPUT, RET1>? part1, Func<INPUT, RET2>? part2 = null)
 		{
-			var name = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-			string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
-			Console.WriteLine($"START {name}");
-			var sw = Stopwatch.StartNew();
-			var fileName = Path.Combine(rootDirectory, Mode == Mode.Full ? Input.DEFAULT_INPUT_FILENAME : Input.DEFAULT_SAMPLE_INPUT_FILENAME);
-			var input = readInput(fileName);
-			Invoke(part1, input, _expected1);
-			Invoke(part2, input, _expected2);
-			Console.WriteLine($"END (after {sw.Elapsed.TotalSeconds} seconds)");
+			Run(Mode.Sample, readInput, part1, part2);
+			Run(Mode.Full, readInput, part1, part2);
+		}
+
+		private static void Run<INPUT, RET1, RET2>(Mode mode, Func<string, INPUT> readInput, Func<INPUT, RET1>? part1, Func<INPUT, RET2>? part2)
+		{
+			if (_expected.TryGetValue(mode, out var e))
+			{
+				var name = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
+				string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
+				Console.WriteLine();
+				Console.WriteLine($"START {name} ({mode} mode)");
+				var sw = Stopwatch.StartNew();
+				var fileName = Path.Combine(rootDirectory, mode == Mode.Full ? Input.DEFAULT_INPUT_FILENAME : Input.DEFAULT_SAMPLE_INPUT_FILENAME);
+				var input = readInput(fileName);
+				var (expected1, expected2) = _expected[mode];
+				Invoke(part1, input, expected1);
+				Invoke(part2, input, expected2);
+				Console.WriteLine($"END (after {sw.Elapsed.TotalSeconds} seconds)");
+			}
 		}
 
 		private static void Invoke<INPUT, RET>(Func<INPUT, RET>? func, INPUT input, string? expected)

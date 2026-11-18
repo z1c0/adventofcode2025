@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using aoc;
+﻿using aoc;
 
-Day.Mode = Mode.Full;
-Day.Expect(1150, 6738);
+Day.Expect(Mode.Sample, 3, 6);
+Day.Expect(Mode.Full, 1150, 6738);
 Day.Run(ParseInput, Part1, Part2);
 
 static int Part1(IEnumerable<(Direction direction, int value)> input) => Solve(input).exact;
