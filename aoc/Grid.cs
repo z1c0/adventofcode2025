@@ -311,12 +311,16 @@ namespace aoc
 			return adjacents;
 		}
 
+		public int CountAdjacent8((int x, int y) p, T t) => CountAdjacent8(p.x, p.y, t);
+
 		public int CountAdjacent8(int x, int y, T t)
 		{
 			var counts = CountAdjacent8Distinct(x, y);
 			counts.TryGetValue(t, out var count);
 			return count;
 		}
+
+		public int CountAdjacent4((int x, int y) p, T t) => CountAdjacent4(p.x, p.y, t);
 
 		public int CountAdjacent4(int x, int y, T t)
 		{
