@@ -21,10 +21,14 @@ namespace aoc
 			ReadTokenized(fileName, tokens => (tokens[0][0], int.Parse(tokens[1])));		
 		public static IEnumerable<(string s, int i)> ReadStringIntList(string fileName = DEFAULT_INPUT_FILENAME) =>
 			ReadTokenized(fileName, tokens => (tokens[0], int.Parse(tokens[1])));
-		public static ImmutableList<(int i1, int i2)> ReadIntIntList(string fileName = DEFAULT_INPUT_FILENAME, string stringDelimiter = " ", string intDelimiter = " ") =>
-			ParseIntIntList(File.ReadAllText(fileName), stringDelimiter, intDelimiter);
-		public static ImmutableList<(long l1, long l2)> ReadLongLongList(string fileName = DEFAULT_INPUT_FILENAME, string stringDelimiter = " ", string intDelimiter = " ") =>
-			ParseLongLongList(File.ReadAllText(fileName), stringDelimiter, intDelimiter);
+		public static ImmutableList<(int i1, int i2)> ReadIntIntList(string fileName = DEFAULT_INPUT_FILENAME) =>
+			ParseIntIntList(ReadStringList(fileName), ",");
+		public static ImmutableList<(int i1, int i2, int i3)> ReadIntIntIntList(string fileName = DEFAULT_INPUT_FILENAME) =>
+			ParseIntIntIntList(ReadStringList(fileName), ",");
+		public static ImmutableList<(long l1, long l2)> ReadLongLongList(string fileName = DEFAULT_INPUT_FILENAME) =>
+			ParseLongLongList(ReadStringList(fileName), ",");
+		public static ImmutableList<(long l1, long l2, long l3)> ReadLongLongLongList(string fileName = DEFAULT_INPUT_FILENAME) =>
+			ParseLongLongLongList(ReadStringList(fileName), ",");
 		public static (ImmutableList<string> block1, ImmutableList<string> block2) ReadBlocks(string fileName = DEFAULT_INPUT_FILENAME)
 		{
 			var lines = ReadStringList(fileName);
@@ -44,10 +48,18 @@ namespace aoc
 			ParseIntIntList(ParseStringList(text, stringDelimiter), intDelimiter);
 		public static ImmutableList<(int i1, int i2)> ParseIntIntList(IEnumerable<string> tokens, string intDelimiter = " ") =>
 			ParseTokenized(tokens, tokens => (int.Parse(tokens[0]), int.Parse(tokens[1])), intDelimiter);
-		public static ImmutableList<(long l1, long l2)> ParseLongLongList(string text, string stringDelimiter = " ", string intDelimiter = " ") =>
-			ParseLongLongList(ParseStringList(text, stringDelimiter), intDelimiter);
-		public static ImmutableList<(long l1, long l2)> ParseLongLongList(IEnumerable<string> tokens, string intDelimiter = " ") =>
-			ParseTokenized(tokens, tokens => (long.Parse(tokens[0]), long.Parse(tokens[1])), intDelimiter);
+		public static ImmutableList<(int i1, int i2, int i3)> ParseIntIntIntList(string text, string stringDelimiter = " ", string intDelimiter = " ") =>
+			ParseIntIntIntList(ParseStringList(text, stringDelimiter), intDelimiter);
+		public static ImmutableList<(int i1, int i2, int i3)> ParseIntIntIntList(IEnumerable<string> tokens, string intDelimiter = " ") =>
+			ParseTokenized(tokens, tokens => (int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2])), intDelimiter);
+		public static ImmutableList<(long l1, long l2)> ParseLongLongList(string text, string stringDelimiter = " ", string longDelimiter = " ") =>
+			ParseLongLongList(ParseStringList(text, stringDelimiter), longDelimiter);
+		public static ImmutableList<(long l1, long l2)> ParseLongLongList(IEnumerable<string> tokens, string longDelimiter = " ") =>
+			ParseTokenized(tokens, tokens => (long.Parse(tokens[0]), long.Parse(tokens[1])), longDelimiter);
+		public static ImmutableList<(long l1, long l2, long l3)> ParseLongLongLongList(string text, string stringDelimiter = " ", string longDelimiter = " ") =>
+			ParseLongLongLongList(ParseStringList(text, stringDelimiter), longDelimiter);
+		public static ImmutableList<(long l1, long l2, long l3)> ParseLongLongLongList(IEnumerable<string> tokens, string longDelimiter = " ") =>
+			ParseTokenized(tokens, tokens => (long.Parse(tokens[0]), long.Parse(tokens[1]), long.Parse(tokens[2])), longDelimiter);
 
 		//
 		// Helpers

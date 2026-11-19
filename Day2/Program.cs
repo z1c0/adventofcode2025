@@ -24,7 +24,7 @@ static long Solve(IEnumerable<(long from, long to)> ranges, bool symmetricOnly)
 	return invalid;
 }
 
-static IEnumerable<(long from, long to)> ParseInput(string fileName) => Input.ReadLongLongList(fileName, ",", "-");
+static IEnumerable<(long from, long to)> ParseInput(string fileName) => Input.ParseLongLongList(File.ReadAllText(fileName), ",", "-");
 
 static int GetDigits(long n) =>	n == 0L ? 1 : (n > 0L ? 1 : 2) + (int)Math.Log10((double)n);
 

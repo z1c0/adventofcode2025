@@ -17,6 +17,8 @@ namespace aoc
 		{
 			_expected[mode] = (expected1?.ToString(), expected2?.ToString());
 		}
+
+		public static Mode Mode { get; private set; }
 		
 		public static void Run<RET1, RET2>(Func<IEnumerable<string>, RET1>? part1, Func<IEnumerable<string>, RET2>? part2 = null) =>
 			Run(Input.ReadStringList, part1, part2);
@@ -34,6 +36,7 @@ namespace aoc
 		{
 			if (_expected.TryGetValue(mode, out var e))
 			{
+				Mode = mode;
 				var name = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
 				string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
 				Console.WriteLine();
@@ -41,6 +44,7 @@ namespace aoc
 				var sw = Stopwatch.StartNew();
 				var fileName = Path.Combine(rootDirectory, mode == Mode.Full ? Input.DEFAULT_INPUT_FILENAME : Input.DEFAULT_SAMPLE_INPUT_FILENAME);
 				var (expected1, expected2) = _expected[mode];
+				Day.Mode = mode;
 				Invoke(part1, readInput1(fileName), expected1);
 				Invoke(part2, readInput2(fileName), expected2);
 				Console.WriteLine($"END (after {sw.Elapsed.TotalSeconds} seconds)");
