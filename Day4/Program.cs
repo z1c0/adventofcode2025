@@ -22,8 +22,8 @@ static int Part2(Grid<char> grid)
 	return total;
 }
 
-static List<(int x, int y)> FindRollsToRemove(Grid<char> grid) =>
+static List<Cell> FindRollsToRemove(Grid<char> grid) =>
 	grid
-		.FindAll((((int x, int y) p, char v) t) => t.v == '@' && grid.CountAdjacent8(t.p, '@') < 4)
+		.FindAll(((Cell p, char v) t) => t.v == '@' && grid.CountAdjacent8(t.p, '@') < 4)
 		.Select(t => t.p)
 		.ToList();

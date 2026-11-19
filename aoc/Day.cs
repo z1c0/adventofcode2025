@@ -21,10 +21,9 @@ namespace aoc
 		public static void Run<RET1, RET2>(Func<IEnumerable<string>, RET1>? part1, Func<IEnumerable<string>, RET2>? part2 = null) =>
 			Run(Input.ReadStringList, part1, part2);
 
-		public static void Run<INPUT, RET1, RET2>(Func<string, INPUT> readInput, Func<INPUT, RET1>? part1, Func<INPUT, RET2>? part2 = null)
-		{
-			Run(Mode.Sample, readInput, part1, readInput, part2);
-		}
+		public static void Run<INPUT, RET1, RET2>(Func<string, INPUT> readInput, Func<INPUT, RET1>? part1, Func<INPUT, RET2>? part2 = null) =>
+			Run(readInput, part1, readInput, part2);
+
 		public static void Run<INPUT1, RET1, INPUT2, RET2>(Func<string, INPUT1> readInput1, Func<INPUT1, RET1>? part1, Func<string, INPUT2> readInput2, Func<INPUT2, RET2>? part2)
 		{
 			Run(Mode.Sample, readInput1, part1, readInput2, part2);

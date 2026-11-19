@@ -4,7 +4,7 @@ namespace aoc
 {
 	public class DictionaryGrid<T> : IGrid<T> where T : struct
 	{
-		private readonly Dictionary<(int x, int y), T> _dict = new();
+		private readonly Dictionary<Cell, T> _dict = new();
 
 		public DictionaryGrid(Grid<T> grid)
 		{
@@ -23,9 +23,9 @@ namespace aoc
 		public int GetMaxX() => _dict.Max(e => e.Key.x);
 		public int GetMaxY() => _dict.Max(e => e.Key.y);
 
-		public IEnumerable<(int x, int y)> FindAll(T t) => FindAll(c => c.v.Equals(t)).Select(e => e.p);
+		public IEnumerable<Cell> FindAll(T t) => FindAll(c => c.v.Equals(t)).Select(e => e.p);
 
-		public IEnumerable<((int x, int y) p, T v)> FindAll(Func<((int x, int y) p, T v), bool> predicate)
+		public IEnumerable<(Cell p, T v)> FindAll(Func<(Cell p, T v), bool> predicate)
 		{
 			foreach (var e in _dict)
 			{
@@ -37,7 +37,7 @@ namespace aoc
 			};
 		}
 
-		public void ForEach(Action<((int x, int y) p, T v)> callback)
+		public void ForEach(Action<(Cell p, T v)> callback)
 		{
 			foreach (var e in _dict)
 			{
@@ -45,7 +45,7 @@ namespace aoc
 			}
 		}
 
-		public T this[(int x, int y) p]
+		public T this[Cell p]
 		{
 			get => _dict[p];
 			set => _dict[p] = value;
@@ -57,9 +57,9 @@ namespace aoc
 			set => this[(x, y)] = value;
 		}
 
-		public IEnumerable<((int x, int y) p, T v)> GetAdjacent8((int x, int y) p, bool getOrCreate = false, T createWith = default)
+		public IEnumerable<(Cell p, T v)> GetAdjacent8(Cell p, bool getOrCreate = false, T createWith = default)
 			=> GetAdjacent8(p.x, p.y, getOrCreate, createWith);
-		public IEnumerable<((int x, int y) p, T v)> GetAdjacent8(int x, int y, bool getOrCreate = false, T createWith = default)
+		public IEnumerable<(Cell p, T v)> GetAdjacent8(int x, int y, bool getOrCreate = false, T createWith = default)
 		{
 			var cells = new[]
 			{
@@ -88,9 +88,9 @@ namespace aoc
 			}
 		}
 
-		public IEnumerable<((int x, int y) p, T v)> GetAdjacent4((int x, int y) p, bool getOrCreate = false, T createWith = default)
+		public IEnumerable<(Cell p, T v)> GetAdjacent4(Cell p, bool getOrCreate = false, T createWith = default)
 			=> GetAdjacent4(p.x, p.y, getOrCreate, createWith);
-		public IEnumerable<((int x, int y) p, T v)> GetAdjacent4(int x, int y, bool getOrCreate = false, T createWith = default)
+		public IEnumerable<(Cell p, T v)> GetAdjacent4(int x, int y, bool getOrCreate = false, T createWith = default)
 		{
 			var cells = new[]
 			{
@@ -114,13 +114,13 @@ namespace aoc
 				}
 			}
 		}
-		public ((int x, int y) p, T v)  Get(int x, int y) => Get((x, y));
-		public ((int x, int y) p, T v) Get((int x, int y) p) => new(p, _dict[p]);
+		public (Cell p, T v)  Get(int x, int y) => Get((x, y));
+		public (Cell p, T v) Get(Cell p) => new(p, _dict[p]);
 
-		public ((int x, int y) p, T v)?  TryGet(int x, int y) => TryGet((x, y));
-		public ((int x, int y) p, T v)? TryGet((int x, int y) p) => _dict.TryGetValue(p, out T value) ? new(p, value) : null;
-		public ((int x, int y) p, T v) GetOrCreate(int x, int y, T createWith = default) => GetOrCreate((x, y), createWith);
-		public ((int x, int y) p, T v) GetOrCreate((int x, int y) p, T createWith = default)
+		public (Cell p, T v)?  TryGet(int x, int y) => TryGet((x, y));
+		public (Cell p, T v)? TryGet(Cell p) => _dict.TryGetValue(p, out T value) ? new(p, value) : null;
+		public (Cell p, T v) GetOrCreate(int x, int y, T createWith = default) => GetOrCreate((x, y), createWith);
+		public (Cell p, T v) GetOrCreate(Cell p, T createWith = default)
 		{
 			if (!_dict.ContainsKey(p))
 			{
@@ -130,7 +130,7 @@ namespace aoc
 		}
 
 		public bool Exists(int x, int y) => Exists((x, y));
-		public bool Exists((int x, int y) p) => _dict.ContainsKey(p);
+		public bool Exists(Cell p) => _dict.ContainsKey(p);
 		
 		public void PrintTo(StringBuilder sb)
 		{

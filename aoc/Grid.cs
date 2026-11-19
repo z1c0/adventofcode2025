@@ -13,7 +13,7 @@ namespace aoc
 
 		public void Print() => Print(null);
 
-		public void Print(Func<(int x, int y), (ConsoleColor color, ConsoleColor? background)>? func)
+		public void Print(Func<Cell, (ConsoleColor color, ConsoleColor? background)>? func)
 		{
 			func ??= (p) => (Console.ForegroundColor, Console.BackgroundColor);
 			for (var y = 0; y < Height; y++)
@@ -28,7 +28,7 @@ namespace aoc
 			}
 		}
 
-		public void ForEach(Action<(int x, int y)> callback)
+		public void ForEach(Action<Cell> callback)
 		{
 			for (var y = 0; y < Height; y++)
 			{
@@ -129,15 +129,15 @@ namespace aoc
 			return counts;
 		}
 
-		public (int x, int y) Find(T t)
+		public Cell Find(T t)
 		{
 			var all = FindAll(t);
 			return all.Any() ? all.First() : (-1, -1);
 		}
 
-		public IEnumerable<(int x, int y)> FindAll(T t) => FindAll(c => c.v.Equals(t)).Select(e => e.p);
+		public IEnumerable<Cell> FindAll(T t) => FindAll(c => c.v.Equals(t)).Select(e => e.p);
 
-		public IEnumerable<(int x, int y)> FindAll(Func<(int x, int y), bool> predicate)
+		public IEnumerable<Cell> FindAll(Func<Cell, bool> predicate)
 		{
 			for (var y = 0; y < Height; y++)
 			{
@@ -152,7 +152,7 @@ namespace aoc
 			}
 		}
 
-		public IEnumerable<((int x, int y) p, T v)> FindAll(Func<((int x, int y) p, T v), bool> predicate)
+		public IEnumerable<(Cell p, T v)> FindAll(Func<(Cell p, T v), bool> predicate)
 		{
 			for (var y = 0; y < Height; y++)
 			{
@@ -184,7 +184,7 @@ namespace aoc
 
 		public int Count(Func<T, bool> func) => Count(p => func(this[p]));
 
-		public int Count(Func<(int x, int y), bool> func)
+		public int Count(Func<Cell, bool> func)
 		{
 			var count = 0;
 			for (var y = 0; y < Height; y++)
@@ -201,7 +201,7 @@ namespace aoc
 			return count;
 		}
 
-		public void ForEach(Action<((int x, int y) p, T v)> callback)
+		public void ForEach(Action<(Cell p, T v)> callback)
 		{
 			for (var y = 0; y < Height; y++)
 			{
@@ -212,37 +212,37 @@ namespace aoc
 			}
 		}
 
-		public (int x, int y) GetNorth((int x, int y) p) => (p.x, p.y - 1);
+		public Cell GetNorth(Cell p) => (p.x, p.y - 1);
 
-		public (int x, int y) GetSouth((int x, int y) p) => (p.x, p.y + 1);
+		public Cell GetSouth(Cell p) => (p.x, p.y + 1);
 
-		public (int x, int y) GetWest((int x, int y) p) => (p.x - 1, p.y);
+		public Cell GetWest(Cell p) => (p.x - 1, p.y);
 
-		public (int x, int y) GetEast((int x, int y) p) => (p.x + 1, p.y);
+		public Cell GetEast(Cell p) => (p.x + 1, p.y);
 
-		public (int x, int y) GetNorthWest((int x, int y) p) => (p.x - 1, p.y - 1);
+		public Cell GetNorthWest(Cell p) => (p.x - 1, p.y - 1);
 
-		public (int x, int y) GetNorthEast((int x, int y) p) => (p.x + 1, p.y - 1);
+		public Cell GetNorthEast(Cell p) => (p.x + 1, p.y - 1);
 
-		public (int x, int y) GetSouthEast((int x, int y) p) => (p.x + 1, p.y + 1);
+		public Cell GetSouthEast(Cell p) => (p.x + 1, p.y + 1);
 
-		public (int x, int y) GetSouthWest((int x, int y) p) => (p.x - 1, p.y + 1);
+		public Cell GetSouthWest(Cell p) => (p.x - 1, p.y + 1);
 
-		public IEnumerable<(int x, int y)> GetAdjacent4((int x, int y) p)
+		public IEnumerable<Cell> GetAdjacent4(Cell p)
 		{
 			return GetAdjacent4(p.x, p.y);
 		}
 
-		public IEnumerable<(int x, int y)> GetAdjacent4(int x, int y) =>
+		public IEnumerable<Cell> GetAdjacent4(int x, int y) =>
 			new[] { GetWest((x, y)), GetEast((x, y)), GetNorth((x, y)), GetSouth((x, y)) }
 				.Where(IsInBounds);
 
-		public IEnumerable<(int x, int y)> GetAdjacent8((int x, int y) p)
+		public IEnumerable<Cell> GetAdjacent8(Cell p)
 		{
 			return GetAdjacent8(p.x, p.y);
 		}
 
-		public IEnumerable<(int x, int y)> GetAdjacent8(int x, int y)
+		public IEnumerable<Cell> GetAdjacent8(int x, int y)
 		{
 			foreach (var a in GetAdjacent4(x, y))
 			{
@@ -270,20 +270,13 @@ namespace aoc
 			}
 		}
 
-		public Dictionary<T, int> CountAdjacent4Distinct(int x, int y)
-		{
-			return GetAdjacentDistinct(x, y, false);
-		}
+		public Dictionary<T, int> CountAdjacent4Distinct(int x, int y) => GetAdjacentDistinct(x, y, false);
 
-		public Dictionary<T, int> CountAdjacent8Distinct(int x, int y)
-		{
-			return GetAdjacentDistinct(x, y, true);
-		}
+		public Dictionary<T, int> CountAdjacent8Distinct(int x, int y) => GetAdjacentDistinct(x, y, true);
 
 		private Dictionary<T, int> GetAdjacentDistinct(int x, int y, bool all)
 		{
 			var adjacents = new Dictionary<T, int>();
-
 			void CheckThenAdd(int x, int y)
 			{
 				if (IsInBounds(x, y))
@@ -311,7 +304,7 @@ namespace aoc
 			return adjacents;
 		}
 
-		public int CountAdjacent8((int x, int y) p, T t) => CountAdjacent8(p.x, p.y, t);
+		public int CountAdjacent8(Cell p, T t) => CountAdjacent8(p.x, p.y, t);
 
 		public int CountAdjacent8(int x, int y, T t)
 		{
@@ -320,7 +313,7 @@ namespace aoc
 			return count;
 		}
 
-		public int CountAdjacent4((int x, int y) p, T t) => CountAdjacent4(p.x, p.y, t);
+		public int CountAdjacent4(Cell p, T t) => CountAdjacent4(p.x, p.y, t);
 
 		public int CountAdjacent4(int x, int y, T t)
 		{
@@ -329,19 +322,13 @@ namespace aoc
 			return count;
 		}
 
-		public bool IsInBounds((int x, int y) p) => IsInBounds(p.x, p.y);
+		public bool IsInBounds(Cell p) => IsInBounds(p.x, p.y);
 
-		public bool IsInBounds(int x, int y)
-		{
-			return x >= 0 && y >= 0 && x < Width && y < Height;
-		}
+		public bool IsInBounds(int x, int y) => x >= 0 && y >= 0 && x < Width && y < Height;
+		
+		public bool IsOnEdge(Cell p) => IsOnEdge(p.x, p.y);
 
-		public bool IsOnEdge((int x, int y) p) => IsOnEdge(p.x, p.y);
-
-		public bool IsOnEdge(int x, int y)
-		{
-			return x == 0 || y == 0 || x == Width - 1 || y == Height - 1;
-		}
+		public bool IsOnEdge(int x, int y) => x == 0 || y == 0 || x == Width - 1 || y == Height - 1;
 
 		public int Count(T t)
 		{
@@ -350,7 +337,7 @@ namespace aoc
 			return count;
 		}
 
-		public T this[(int x, int y) p]
+		public T this[Cell p]
 		{
 			get => this[p.x, p.y];
 			set => this[p.x, p.y] = value;
@@ -396,7 +383,7 @@ namespace aoc
 			return newGrid;
 		}
 
-		public IEnumerable<IEnumerable<(int x, int y)>> GetRows()
+		public IEnumerable<IEnumerable<Cell>> GetRows()
 		{
 			for (var y = 0; y < Height; y++)
 			{
@@ -404,7 +391,7 @@ namespace aoc
 			}
 		}
 		
-		public IEnumerable<IEnumerable<(int x, int y)>> GetColumns()
+		public IEnumerable<IEnumerable<Cell>> GetColumns()
 		{
 			for (var x = 0; x < Width; x++)
 			{
