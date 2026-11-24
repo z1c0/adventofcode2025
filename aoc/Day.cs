@@ -13,26 +13,26 @@ namespace aoc
 	{
 		private static readonly Dictionary<Mode, (string? expected1, string? expected2)> _expected = [];
 
-		public static void Expect<T1, T2>(Mode mode, T1? expected1, T2? expected2 = default)
+		public static void Expect<T>(Mode mode, T? expected1, T? expected2 = default)
 		{
 			_expected[mode] = (expected1?.ToString(), expected2?.ToString());
 		}
 
 		public static Mode Mode { get; private set; }
 		
-		public static void Run<RET1, RET2>(Func<IEnumerable<string>, RET1>? part1, Func<IEnumerable<string>, RET2>? part2 = null) =>
+		public static void Run<RET>(Func<IEnumerable<string>, RET>? part1, Func<IEnumerable<string>, RET>? part2 = null) =>
 			Run(Input.ReadStringList, part1, part2);
 
-		public static void Run<INPUT, RET1, RET2>(Func<string, INPUT> readInput, Func<INPUT, RET1>? part1, Func<INPUT, RET2>? part2 = null) =>
+		public static void Run<INPUT, RET>(Func<string, INPUT> readInput, Func<INPUT, RET>? part1, Func<INPUT, RET>? part2 = null) =>
 			Run(readInput, part1, readInput, part2);
 
-		public static void Run<INPUT1, RET1, INPUT2, RET2>(Func<string, INPUT1> readInput1, Func<INPUT1, RET1>? part1, Func<string, INPUT2> readInput2, Func<INPUT2, RET2>? part2)
+		public static void Run<INPUT1, INPUT2, RET>(Func<string, INPUT1> readInput1, Func<INPUT1, RET>? part1, Func<string, INPUT2> readInput2, Func<INPUT2, RET>? part2)
 		{
 			Run(Mode.Sample, readInput1, part1, readInput2, part2);
 			Run(Mode.Full, readInput1, part1, readInput2, part2);
 		}
 
-		private static void Run<INPUT1, RET1, INPUT2, RET2>(Mode mode, Func<string, INPUT1> readInput1, Func<INPUT1, RET1>? part1, Func<string, INPUT2> readInput2, Func<INPUT2, RET2>? part2)
+		private static void Run<INPUT1, INPUT2, RET>(Mode mode, Func<string, INPUT1> readInput1, Func<INPUT1, RET>? part1, Func<string, INPUT2> readInput2, Func<INPUT2, RET>? part2)
 		{
 			if (_expected.TryGetValue(mode, out var e))
 			{

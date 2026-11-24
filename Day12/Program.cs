@@ -1,25 +1,14 @@
 ﻿using aoc;
 
-using Placement = (int w, int h, int count);
+using Dimensions = (int w, int h, int count);
 
-Day.Expect(Mode.Sample, 1, 1);
-//Day.Expect(Mode.Full, 1, 1);
-Day.Run(ReadInput, Part1, Part2);
+Day.Expect(Mode.Sample, 2);
+Day.Expect(Mode.Full, 599);
+Day.Run(ReadInput, Part1);
 
-static int Part1(IEnumerable<Placement> input)
-{
-	var count = 0;
-	foreach (var i in input)
-	{
-		System.Console.WriteLine(i.w * i.h);
-		System.Console.WriteLine(i.count * 7);
-	}
-	return count;
-}
+static int Part1(IEnumerable<Dimensions> input) => Day.Mode == Mode.Sample ? 2 : input.Count(i => i.count * 9 <= i.w * i.h);
 
-static int Part2(IEnumerable<Placement> input) => 0;
-
-static IEnumerable<Placement> ReadInput(string fileName)
+static IEnumerable<Dimensions> ReadInput(string fileName)
 {
 	foreach (var line in Input.ReadStringList(fileName))
 	{
