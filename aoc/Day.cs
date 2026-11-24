@@ -38,17 +38,30 @@ namespace aoc
 			{
 				Mode = mode;
 				var name = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-				string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
 				Console.WriteLine();
 				Console.WriteLine($"START {name} ({mode} mode)");
 				var sw = Stopwatch.StartNew();
-				var fileName = Path.Combine(rootDirectory, mode == Mode.Full ? Input.DEFAULT_INPUT_FILENAME : Input.DEFAULT_SAMPLE_INPUT_FILENAME);
 				var (expected1, expected2) = _expected[mode];
-				Day.Mode = mode;
-				Invoke(part1, readInput1(fileName), expected1);
-				Invoke(part2, readInput2(fileName), expected2);
+				Mode = mode;
+				Invoke(part1, readInput1(GetFileName(mode, 1)), expected1);
+				Invoke(part2, readInput2(GetFileName(mode, 2)), expected2);
 				Console.WriteLine($"END (after {sw.Elapsed.TotalSeconds} seconds)");
 			}
+		}
+
+		private static string GetFileName(Mode mode, int part)
+		{
+			string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
+			if (mode == Mode.Full)
+			{
+				return Path.Combine(rootDirectory, Input.DEFAULT_INPUT_FILENAME);
+			}
+			var fileName = Path.Combine(rootDirectory, Input.DEFAULT_SAMPLE_INPUT_FILENAME);
+			if (!Path.Exists(fileName))
+			{
+				fileName = Path.ChangeExtension(fileName, null) + part + Path.GetExtension(fileName);
+			}
+			return fileName;
 		}
 
 		private static void Invoke<INPUT, RET>(Func<INPUT, RET>? func, INPUT input, string? expected)
