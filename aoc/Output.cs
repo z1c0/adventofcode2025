@@ -8,6 +8,6 @@ namespace aoc
 			Console.WriteLine($"[{string.Join(", ", list)}]");
 		
 		public static void Print(BitArray bits) =>
-			System.Console.WriteLine($"[{string.Concat(bits.Cast<bool>().Select(b => b ? '#' : '.'))}]");
+			Console.WriteLine($"[{string.Concat(bits.Cast<bool>().Select(b => b ? '#' : '.'))}]");
 	}
 }

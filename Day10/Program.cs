@@ -1,22 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Immutable;
-using System.Dynamic;
+﻿using System.Collections.Immutable;
 using aoc;
+using Google.OrTools.LinearSolver;
 
-Day.Expect(Mode.Sample, 7, 1);
-//Day.Expect(Mode.Full, 436, 1);
+Day.Expect(Mode.Sample, 7, 33);
+Day.Expect(Mode.Full, 436, 14999);
 Day.Run(ReadInput, Part1, Part2);
 
-static int Part1(IEnumerable<(BitArray lights, List<BitArray> buttons, ImmutableList<int> joltages)> input)
+static int Part1(IEnumerable<(ImmutableList<int> lights, List<ImmutableList<int>> buttons, ImmutableList<int> joltages)> input)
 {
+	static int ToInt(ImmutableList<int> bits)
+	{
+		var i = 0;
+		foreach (var b in bits)
+		{
+			i += 1 << b;
+		}
+		return i;
+	}
+
 	var total = 0;
 	foreach (var m in input)
 	{
 		var minPresses = int.MaxValue;
 		foreach (var c in AllCombinations(m.buttons))
 		{
-			var result = c.Skip(1).Aggregate((BitArray)c[0].Clone(), (acc, b) => acc.Xor(b));
-			if (ToInt(result) == ToInt(m.lights))
+			var result = c.Aggregate(0, (acc, b) => acc ^ ToInt(b));
+			if (result == ToInt(m.lights))
 			{
 				minPresses = Math.Min(minPresses, c.Count);
 			}
@@ -26,34 +35,61 @@ static int Part1(IEnumerable<(BitArray lights, List<BitArray> buttons, Immutable
 	return total;
 }
 
-static int Part2(IEnumerable<(BitArray lights, List<BitArray> buttons, ImmutableList<int> joltages)> input)
+static int Part2(IEnumerable<(ImmutableList<int> lights, List<ImmutableList<int>> buttons, ImmutableList<int> joltages)> input)
 {
-	var total = 0;
-	foreach (var m in input)
+	static int SolveIntegerLinearProgramming(double[,] A, double[] r)
 	{
-		List<List<int>> candidates = new();
-		for (var d = 0; d < m.joltages.Count; d++)
+		var rows = A.GetLength(0);
+		var cols = A.GetLength(1);
+
+		var solver = Solver.CreateSolver("SCIP");
+		var v = solver.MakeIntVarArray(cols, 0, double.PositiveInfinity, "v");
+		for (var i = 0; i < rows; i++)
 		{
-			List<List<int>> combinations = null;
-			foreach (var c in combinations)
+			var con = solver.MakeConstraint(r[i], r[i]);
+			for (var j = 0; j < cols; j++)
 			{
-				if (TestJoltage(c, m.joltages))
+				if (A[i, j] != 0)
 				{
-					candidates.Add(c);
+					con.SetCoefficient(v[j], A[i, j]);
 				}
 			}
-			//...
 		}
+		var obj = solver.Objective();
+		for (var j = 0; j < cols; j++)
+		{
+			obj.SetCoefficient(v[j], 1);
+		}
+		obj.SetMinimization();
+		solver.Solve();
+		return (int)v.Sum(x => x.SolutionValue());
 	}
-	return 0;
+	
+	var result = 0;
+	foreach (var m in input)
+	{
+		var A = new double[m.joltages.Count, m.buttons.Count];
+		var y = 0;
+		foreach (var b in m.buttons)
+		{
+			foreach (var d in b)
+			{
+				A[d, y] = 1;
+			}
+			y++;
+		}
+		var r = m.joltages.Select(j => (double)j).ToArray();
+		result += SolveIntegerLinearProgramming(A, r);
+	}
+	return result;
 }
 
-static int ToInt(BitArray bits)
-{
-	var arr = new int[1];
-	bits.CopyTo(arr, 0);
-	return arr[0];
-}
+static IEnumerable<ImmutableList<T>> AllCombinationsOfSize<T>(IEnumerable<T> items, int n) =>
+	n == 0
+		? new[] { ImmutableList<T>.Empty }
+		: items.SelectMany((item, i) =>
+			AllCombinationsOfSize(items.Skip(i).ToList(), n - 1)
+				.Select(rest => rest.Insert(0, item)));
 
 static List<List<T>> AllCombinations<T>(List<T> input) =>
 	input.Aggregate(
@@ -63,26 +99,19 @@ static List<List<T>> AllCombinations<T>(List<T> input) =>
 	.ToList();
 
 	
-static IEnumerable<(BitArray lights, List<BitArray> buttons, ImmutableList<int> joltages)> ReadInput(string fileName)
+static IEnumerable<(ImmutableList<int> lights, List<ImmutableList<int>> buttons, ImmutableList<int> joltages)> ReadInput(string fileName)
 {
 	foreach (var line in Input.ReadStringList(fileName))
 	{
 		var tokens = Input.ParseStringList(line);
 		var t = tokens.First()[1..^1];
-		var lights = new BitArray(t.Length);
-		for (var i = 0; i < t.Length; i++)
-		{
-			lights.Set(i, t[i] == '#');
-		}
-		var buttons = new List<BitArray>();
+		var lights = Enumerable.Range(0, t.Length)
+			.Where(i => t[i] == '#')
+			.ToImmutableList();
+		var buttons = new List<ImmutableList<int>>();
 		foreach (var b in tokens.Skip(1).SkipLast(1))
 		{
-			var button = new BitArray(lights.Length);
-			foreach (var n in Input.ParseIntList(b[1..^1], ","))
-			{
-				button.Set(n, true);
-			}
-			buttons.Add(button);
+			buttons.Add(Input.ParseIntList(b[1..^1], ","));
 		}
 		yield return
 		(
